@@ -13,7 +13,7 @@ public class bowStringControl : MonoBehaviour
     private XRGrabInteractable interactable;
 
     [SerializeField]
-    private Transform midpointGrabObject,midPointVisualObject,midPointParent;
+    private Transform midPointGrabObject,midPointVisualObject,midPointParent;
 
     [SerializeField]
     private float bowStrengthLimit = 0.3f;
@@ -23,9 +23,9 @@ public class bowStringControl : MonoBehaviour
 
     private void Awake()
     {
-        interactable = midpointGrabObject.GetComponent<XRGrabInteractable>();
+        interactable = midPointGrabObject.GetComponent<XRGrabInteractable>();
     }
-    void Start()
+    private void Start()
     {
         interactable.selectEntered.AddListener(PrepareBowString);
         interactable.selectExited.AddListener(ResetBowString);
@@ -34,7 +34,7 @@ public class bowStringControl : MonoBehaviour
     private void ResetBowString(SelectExitEventArgs arg0)
     {
         interactor = null;
-        midpointGrabObject.localPosition = Vector3.zero;
+        midPointGrabObject.localPosition = Vector3.zero;
         midPointVisualObject.localPosition = Vector3.zero;
         bowStingRenderer.CreateString(null);
     }
@@ -51,29 +51,38 @@ public class bowStringControl : MonoBehaviour
     {
         if (interactor != null)
         {
-            Vector3 midPointLocalSpace = midPointParent.InverseTransformPoint(midpointGrabObject.position);
+            Vector3 midPointLocalSpace = midPointParent.InverseTransformPoint(midPointGrabObject.position);
             
-            float midpointLocalZAbs = Mathf.Abs(midPointLocalSpace.z);
+            float midpointLocalZAbs = Mathf.Abs(midPointLocalSpace.x);
             HandStringPushedBackToStart(midPointLocalSpace);
             HandleStringPulledBackTolimit(midpointLocalZAbs, midPointLocalSpace);
             HandlePullingString(midpointLocalZAbs, midPointLocalSpace);
-            bowStingRenderer.CreateString(midpointGrabObject.transform.position);
+            bowStingRenderer.CreateString(midPointVisualObject.position);
 
         }
     }
 
     private void HandlePullingString(float midpointLocalZAbs, Vector3 midPointLocalSpace)
     {
-        throw new NotImplementedException();
+        if (midPointLocalSpace.x > 0 && midpointLocalZAbs < bowStrengthLimit)
+        {
+            midPointVisualObject.localPosition = new Vector3(0, 0, midPointLocalSpace.x);
+        }
     }
 
     private void HandleStringPulledBackTolimit(float midpointLocalZAbs, Vector3 midPointLocalSpace)
     {
-        throw new NotImplementedException();
+        if (midPointLocalSpace.x > 0 && midpointLocalZAbs >= bowStrengthLimit)
+        {
+            midPointVisualObject.localPosition = new Vector3(0, 0, bowStrengthLimit);
+        }
     }
 
     private void HandStringPushedBackToStart(Vector3 midPointLocalSpace)
     {
-        throw new NotImplementedException();
+        if (midPointLocalSpace.x <= 0 )
+        {
+            midPointVisualObject.localPosition = Vector3.zero;
+        }
     }
 }
